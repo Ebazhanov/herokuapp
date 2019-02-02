@@ -1,76 +1,61 @@
 package tests;
 
 import base.BasicUiClass;
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.Selenide;
+import edu.emory.mathcs.backport.java.util.Collections;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.testng.annotations.Test;
+import pages.AvatarPage;
+import pages.DataProviderStorage;
 import pages.LoginPage;
+import pages.TablePage;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
+import static pages.TablePage.TABLE_2_FIRST_NAME_COLUMN;
 
-@Feature("Login functionality")
+@Feature("All test scenarios")
 public class AndooTests extends BasicUiClass {
 
-    @Test
-    @Story("#1 Scenario Login Success")
-    public void loginSuccess() {
+    @Test(dataProvider = "loginVerification", dataProviderClass = DataProviderStorage.class)
+    @Story("#1,2,3 Scenario Login Success & Failure")
+    public void loginSuccess(String loginName, String password, String flashMessage) {
         new LoginPage()
-                .enterUserName("tomsmith")
-                .enterPassword("SuperSecretPassword!")
+                .openLoginPage("/login")
+                .enterUserName(loginName)
+                .enterPassword(password)
                 .clickOnSubmitButton()
-                .verifySuccessFlashMessageText("You logged into a secure area!");
+                .verifyFlashMessageText(flashMessage);
     }
 
-    @Test
-    @Story("#2 scenario Login failure 2")
-    public void loginInvalid1() {
-        new LoginPage()
-                .enterUserName("invalidsmith")
-                .enterPassword("SuperSecretPassword!")
-                .clickOnSubmitButton()
-                .verifyErrorFlashMessageText("Your username is invalid!");
+    @Test(dataProvider = "avatarHover", dataProviderClass = DataProviderStorage.class)
+    @Story("#4 scenario Hovers 3 avatars")
+    public void hover(String avatarNumber, String nameOfAvatar) {
+        new AvatarPage()
+                .openAvatarPage("/hovers")
+                .hoverOverAvatarNumber(avatarNumber)
+                .verifyTextUnderAvatar(avatarNumber, nameOfAvatar);
     }
 
-    @Test
-    @Story("#3 scenario Login failure 3")
-    public void loginInvalid2() {
-        new LoginPage()
-                .enterUserName("tomsmith")
-                .enterPassword("InvalidPassword!")
-                .clickOnSubmitButton()
-                .verifyErrorFlashMessageText("Your password is invalid!");
-    }
-
-    @Test
-    @Story("#4 scenario Hovers")
-    public void hover() {
-        Selenide.open("http://the-internet.herokuapp.com/hovers");
-/*
-        $("div:nth-child(3) > img").hover();
-        $(".figcaption").#content > div > div:nth-child(4) > imgshouldHave(Condition.text("name: user1\nView profile"));
-*/
-
-/*
-        $("div:nth-child(4) > img").hover();
-        $(".figcaption").waitUntil(Condition.visible, 1000).shouldHave(Condition.text("name: user2\nView profile"));
-*/
-
-        $("div:nth-child(5) > img").hover();
-        $(".figcaption").shouldHave(Condition.text("name: user3\nView profile"));
-    }
 
     @Test
     @Story("#5 scenario sortable data table")
     public void sortableDataTable() {
-        Selenide.open("http://the-internet.herokuapp.com/tables");
-        ArrayList firstNameColumnData = (ArrayList) $$("#table2 > tbody .first-name").texts();
-        
-    }
+        TablePage tablePage = new TablePage();
+        tablePage.openTablePage("/tables");
 
+        List<String> expectedSorting = $$(TABLE_2_FIRST_NAME_COLUMN).texts();
+        Collections.sort(expectedSorting);
+
+        tablePage.clickOnHeaderToSortByAscending();
+        List<String> actualAscendingSort = $$(TABLE_2_FIRST_NAME_COLUMN).texts();
+        tablePage.assertResultHaveTheSameSorting(expectedSorting, actualAscendingSort);
+
+        tablePage.clickOnHeaderToSortByDescending();
+        Collections.reverse(expectedSorting);
+        List<String> actualDescendingSort = $$(TABLE_2_FIRST_NAME_COLUMN).texts();
+        tablePage.assertResultHaveTheSameSorting(expectedSorting, actualDescendingSort);
+    }
 
 }

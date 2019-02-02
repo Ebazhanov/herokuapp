@@ -1,8 +1,6 @@
 # herokuapp
 
-### Done
-
-- [x] run tests in parallel mode;
+### How to run 
 
 ```mvn clean test```
 
@@ -10,9 +8,11 @@
 
 ```mvn allure:report```
 
+### How to open in browser
+
 ```mvn allure:serve```
 
-### Video how does it looks like
+### See all in this video
 
-- [parallel run/diff browser(firefox) + env(prod)](https://monosnap.com/file/veYCgJGsbi9ov3s94j0eROYsPHmro2)
+- [watch it here]()
 
