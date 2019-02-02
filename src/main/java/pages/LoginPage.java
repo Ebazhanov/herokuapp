@@ -1,7 +1,7 @@
 package pages;
 
-import com.codeborne.selenide.Condition;
-
+import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 
 public class LoginPage {
@@ -21,8 +21,13 @@ public class LoginPage {
         return this;
     }
 
-    public LoginPage verifyFlashMessageText(String messageText) {
-        $("#flash").shouldHave(Condition.text(messageText)).isDisplayed();
+    public LoginPage verifySuccessFlashMessageText(String messageText) {
+        $(".flash.success").shouldHave(text(messageText));
+        return this;
+    }
+
+    public LoginPage verifyErrorFlashMessageText(String messageText) {
+        $(".flash.error").shouldHave(text(messageText));
         return this;
     }
 
